@@ -1,5 +1,0 @@
-import httplib
-
-conn = httplib.HTTPConnection('127.0.0.1:5000')
-conn.request('GET','/070100')
-print conn.getresponse().read()
