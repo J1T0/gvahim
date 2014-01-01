@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask
 import httplib
 
 class FlaskPeer(object):
@@ -7,13 +7,26 @@ class FlaskPeer(object):
 	def __init__(self):
 		self.app = Flask(__name__)
 		self.peers = []
-		self.potocolVer = '0100'
+		self.potocolVer = '0101'
+
 	def m00(self, dat):
 		pass
 	def m10(self, dat):
-		pass
+		if not dat == self.protocolVer:
+			pass
 	def m20(self, dat):
-		pass
+		ttl = dat[:2]
+		source_addr = dat[2:10]
+		port = [10:12]
+		numOfDest = int(dat[12:14],16)
+		addrs = dat[14:]
+		parsedAddrs = []
+		parsedPorts = []
+		for i in range(numOfDest):
+			parsedAddrs.append(addrs[i*8:(i+1)*8])
+			parsedPorts.append(addrs[ (numOfDest*8 + i*4) : (numOfDest*8 + (i + 1)*4) ])
+		
+		
 	def m30(self, dat):
 		pass
 	def m40(self, dat):
