@@ -41,10 +41,8 @@ class FlaskPeer(object):
 						m41(data)
 					message = message[(int(message[2:4],16)*2 +4):]
 					continue
-				data = message[6:(int(message[2:6],16)*2 +6)]
+				data = message[(int(message[2:6],16)*2 +6):]
 				m40(data)
-				message = message[(int(message[2:6],16)*2 +6):]
-
 			return ''
 		self.app.run(debug=True)
 
