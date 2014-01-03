@@ -4,10 +4,13 @@ import httplib
 class FlaskPeer(object):
 	
 	
-	def __init__(self):
+	def __init__(self, ip, port):
+		self.ip = ip
+		self.port = port
 		self.app = Flask(__name__)
 		self.peers = []
 		self.potocolVer = '0101'
+		self.dests = { }
 
 	def m00(self, dat):
 		pass
@@ -20,12 +23,10 @@ class FlaskPeer(object):
 		port = [10:12]
 		numOfDest = int(dat[12:14],16)
 		addrs = dat[14:]
-		parsedAddrs = []
-		parsedPorts = []
 		for i in range(numOfDest):
-			parsedAddrs.append(addrs[i*8:(i+1)*8])
-			parsedPorts.append(addrs[ (numOfDest*8 + i*4) : (numOfDest*8 + (i + 1)*4) ])
-		
+			parsedAddr= addrs[i*8:(i+1)*8]
+			parsedPort =addrs[ (numOfDest*8 + i*4) : (numOfDest*8 + (i + 1)*4) ]
+			self.dests[parsedAddr] = parsedPort
 		
 	def m30(self, dat):
 		pass
@@ -36,6 +37,7 @@ class FlaskPeer(object):
 	def runServer(self):
 		@self.app.route('/<string:message>')
 		def readMassage(message):
+			self.dests = {}
 			while len(message)>5:
 				key = message[:2]
 				if not key in ['40']: # 40 massage has 2 byte long length param.
@@ -59,8 +61,8 @@ class FlaskPeer(object):
 				message = message[(int(message[2:6],16)*2 +6):]
 
 			return ''
-		self.app.run(debug=True)
+		self.app.run(debug = True, host = self.ip, port = self.port)
 
 if __name__=='__main__':
-	server=FlaskPeer()
+	server=FlaskPeer('10.0.2.15',5000)
 	server.runServer()
