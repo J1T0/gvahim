@@ -48,26 +48,26 @@ class FlaskPeer(object):
 		def readMassage(message):
 			self.message = ''				
 			self.dests = {}
-			while len(message)>5:
+			while len(message)>5: # shortest message in the protocol is 6 chars long
 				key = message[:2]
 				if not key in ['40']: # 40 massage has 2 byte long length param.
-					data = message[4:(int(message[2:4],16)*2 +4)]
+					data = message[4:(int(message[2:4],16)*2 +4)] # splits the message from the rest of the string by len 
 					if key in ['00' , '10', '20', '30', '41']: # protocol error
 						return ''
-					if key == '00':
+					if key == '00':  # status message
 						m00(data)
-					elif key == '10':
+					elif key == '10':  # protocol message
 						m10(data)
-					elif key == '20':
+					elif key == '20':  # routing message
 						m20(data)
-					elif key == '30':
+					elif key == '30':  
 						m30(data)
-					elif key == '41':
+					elif key == '41':  # data message
 						m41(data)
 					message = message[(int(message[2:4],16)*2 +4):]
 					continue
 				data = message[6:(int(message[2:6],16)*2 +6)]
-				m40(data)
+				m40(data)  #  data request
 				message = message[(int(message[2:6],16)*2 +6):]
 			if self.ip in self.dests.keys():
 				del self.dests[self.ip]
@@ -78,5 +78,5 @@ class FlaskPeer(object):
 		self.app.run(debug = True, host = self.ip, port = self.port)
 
 if __name__=='__main__':
-	server=FlaskPeer('10.0.2.15',5000)
+	server=FlaskPeer('localhost',5000)
 	server.runServer()
