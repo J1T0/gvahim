@@ -7,7 +7,7 @@ class FlaskPeer(object):
 		self.ip = ip
 		self.port = port
 		self.app = Flask(__name__)
-		self.peers = []
+		self.peers = {}
 		self.parser = Parser()
 
 	def runServer(self):
@@ -21,5 +21,5 @@ class FlaskPeer(object):
 		self.app.run(debug = True, host = self.ip, port = self.port)
 
 	def sendResponses(self, responseTuple, sourceIP):
-		
+		pass
 		
