@@ -11,15 +11,17 @@ class FlaskPeer(object):
 		self.peers = []
 		self.potocolVer = '0101'
 		self.dests = { }
+		self.sourceAddr = ''
 
 	def m00(self, dat):
 		pass
 	def m10(self, dat):
-		if not dat == self.protocolVer:
-			pass
+		if self.ip in self.dests:
+			if not dat == self.protocolVer:
+				pass
 	def m20(self, dat):
 		ttl = dat[:2]
-		source_addr = dat[2:10]
+		self.sourceAddr = dat[2:10]
 		port = [10:12]
 		numOfDest = int(dat[12:14],16)
 		addrs = dat[14:]
