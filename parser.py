@@ -28,7 +28,6 @@ class Parser(object):
 	def m41(self, dat):
 		pass	
 	
-	
 	def parseMessage(message):
 		self.dests = {}
 		while len(message)>5:
