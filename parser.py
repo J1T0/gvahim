@@ -40,11 +40,9 @@ class Parser(object):
 		return parsedPort
 
 	def m00(self, dat):
-		print 'in 00'
 		print self.peer.joinRequestQueue
 		for i in xrange(len(self.peer.joinRequestQueue)):
 			if self.peer.joinRequestQueue[i][0] == self.sourceAddr and self.peer.joinRequestQueue[i][1] == self.sourcePort:
-				print dat
 				if dat == '00':
 					self.peer.addPeer(self.peer.joinRequestQueue[i][0], self.peer.joinRequestQueue[i][1])
 				del self.peer.joinRequestQueue[i]
@@ -67,6 +65,7 @@ class Parser(object):
 		numOfDest = int(dat[14:16],16)
 		addrs = dat[16:]
 		if numOfDest * 12 != len(addrs):
+			print 'len'
 			raise ProtocolError()
 		dests={}
 		for i in range(numOfDest):
@@ -86,9 +85,15 @@ class Parser(object):
 			print 'm30'+str(e)
 			self.responseMessage += '000101'
 	def m40(self, dat):
-		pass
+		self.peer.saveFile(dat)
 	def m41(self, dat):
-		pass	
+		text = self.peer.getFileBytes(dat)
+		self.responseMessage += '40'
+		lenText = hex(len(text)).split('x')[1].upper()
+		self.responseMessage += (4-len(lenText))*'0'
+		self.responseMessage += lenText
+		self.responseMessage += text
+		print 'm41' + text
 	
 	def parseJoinRequest(self,ip,port):
 		parsedIP = self.parseIPToHexStr(ip)
@@ -111,6 +116,29 @@ class Parser(object):
 		response += ip
 		response += port
 		return response
+	def parseFileRequest(self, fileName):
+		out = '200E'
+		out += 'FF'
+		out += self.parseIPToHexStr(self.ip)
+		out += self.parsePortToHexStr(self.port)
+		peerAmount = hex(len(self.peer.peers)).split('x')[1].upper()
+		if len(peerAmount) == 1:
+			out+='0'
+		out += peerAmount
+		ips = ''
+		ports = ''
+		for i in self.peer.peers:
+			ips += i
+			ports += self.peer.peers[i]
+		out += ips
+		out += ports
+		out += '41'
+		nameLen = hex(len(fileName)/2).split('x')[1].upper()
+		if len(nameLen) == 1:
+			out+= str(0)
+		out += nameLen 
+		out += fileName
+		return out
 	def parseMessage(self, message):
 		self.dests = {}
 		while len(message)>5:
@@ -119,6 +147,7 @@ class Parser(object):
 				if not key in ['40']: # 40 massage has 2 byte long length param.
 					data = message[4:(int(message[2:4],16)*2 +4)]
 					if key not in ['00' , '10', '20', '30', '41']: # protocol error
+						print 'key error'
 						raise ProtocolError()
 					if key == '00':
 						self.m00(data)
